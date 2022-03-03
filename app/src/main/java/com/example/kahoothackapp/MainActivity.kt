@@ -168,7 +168,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun editQuizID(foundID: String = ""){
         editMode = true
-        setStatusText(true, "Detected ID wasn't detected properly")
+        setStatusText(true, "Extracted ID wasn't resolved properly")
         idPrompt.setText(foundID)
         idPrompt.setHint("Input quiz ID manually")
         idPrompt.visibility = View.VISIBLE
