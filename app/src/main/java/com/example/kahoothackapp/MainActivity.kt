@@ -14,6 +14,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.view.isVisible
 import com.google.gson.Gson
 import com.google.gson.JsonElement
@@ -35,7 +36,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var idPrompt: EditText
     private var editMode = false
 
-    private var QUIZ_ID_REGEX: Regex = Regex("details/(.+)")
+    private var QUIZ_ID_REGEX_ONE: Regex = Regex("details/(.+)")
+    private var QUIZ_ID_REGEX_TWO: Regex = Regex("quiz(?:i|l)d=(.+)", RegexOption.IGNORE_CASE)
     private lateinit var answersIntent: Intent
 
     companion object {
@@ -46,6 +48,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        //AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
 
         button = findViewById(R.id.gallery)
         imageView = findViewById(R.id.image)
@@ -102,23 +105,17 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun handleText(text: Text){
-        var toExtract: String = ""
+        var match: MatchResult? = null
         for (block in text.textBlocks) {
             val blockText = block.text
-            if(blockText.contains("kahoot.it/details/")){
-                toExtract = blockText
-                break
-            }
+            match = QUIZ_ID_REGEX_ONE.find(blockText)
+            if(match == null) match = QUIZ_ID_REGEX_TWO.find(blockText)
+            if(match != null) break
         }
-        if(toExtract == "")
-            return setStatusText(true, "No quiz ID was detected")
-
-
-        var quizID: MatchResult? = QUIZ_ID_REGEX.find(toExtract)
-        if(quizID == null)
+        if(match == null)
             return setStatusText(true, "Quiz ID couldn't be extracted")
 
-        fetchAnswers(quizID.groupValues[1])
+        fetchAnswers(match.groupValues[1])
     }
 
     private fun fetchAnswers(quizID: String){
@@ -132,7 +129,7 @@ class MainActivity : AppCompatActivity() {
                 var body = response.body?.string()
                 var json: JsonObject? = JsonParser().parse(body)?.asJsonObject
 
-                if (body == null || json == null || json.get("error")?.asString == "NOT_FOUND") {
+                if (detectError(body, json)) {
                     runOnUiThread(Runnable() {
                         editQuizID(quizID)
                     })
@@ -146,6 +143,13 @@ class MainActivity : AppCompatActivity() {
                 editQuizID(quizID)
             }
         })
+    }
+
+    private fun detectError(body: String?, json: JsonObject?): Boolean {
+        if(body == null || json == null) return true
+        if(json.get("error")?.asString == "NOT_FOUND") return true
+        if(body.contains("UUID is invalid")) return true
+        return false
     }
 
     private fun setStatusText(enabled: Boolean, text: String? = null){
@@ -168,7 +172,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun editQuizID(foundID: String = ""){
         editMode = true
-        setStatusText(true, "Extracted ID wasn't resolved properly")
+        setStatusText(true, "Extracted ID wasn't resolved properly. Check characters like o/0 or i/l/f")
         idPrompt.setText(foundID)
         idPrompt.setHint("Input quiz ID manually")
         idPrompt.visibility = View.VISIBLE

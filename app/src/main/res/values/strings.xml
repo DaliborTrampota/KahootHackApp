@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">KahootHackApp</string>
+    <string name="select_image">Select Image</string>
+    <string name="loaded_image">Loaded Image</string>
 </resources>
