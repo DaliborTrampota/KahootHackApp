@@ -1,4 +1,4 @@
-package com.example.kahoothackapp.database
+package com.dalibortrampota.kahoothackapp.database
 
 import androidx.room.*
 

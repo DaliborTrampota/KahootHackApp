@@ -1,14 +1,15 @@
-package com.example.kahoothackapp
+package com.dalibortrampota.kahoothackapp
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.kahoothackapp.adapters.HistoryAdapter
-import com.example.kahoothackapp.database.QuestionsDao
-import com.example.kahoothackapp.database.QuestionsDatabase
-import com.example.kahoothackapp.database.Quiz
+import com.dalibortrampota.kahoothackapp.adapters.HistoryAdapter
+import com.dalibortrampota.kahoothackapp.database.QuestionsDao
+import com.dalibortrampota.kahoothackapp.database.QuestionsDatabase
+import com.dalibortrampota.kahoothackapp.database.Quiz
+import com.dalibortrampota.kahoothackapp.R
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch

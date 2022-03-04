@@ -1,4 +1,4 @@
-package com.example.kahoothackapp
+package com.dalibortrampota.kahoothackapp
 
 import android.content.Intent
 import android.net.Uri
@@ -14,8 +14,8 @@ import android.widget.TextView
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import com.example.kahoothackapp.database.QuestionsDatabase
-import com.example.kahoothackapp.database.QuizInsert
+import com.dalibortrampota.kahoothackapp.database.QuestionsDatabase
+import com.dalibortrampota.kahoothackapp.database.QuizInsert
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser

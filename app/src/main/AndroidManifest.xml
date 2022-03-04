@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.kahoothackapp">
+    package="com.dalibortrampota.kahoothackapp">
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -13,14 +13,14 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.KahootHackApp">
         <activity
-            android:name="com.example.kahoothackapp.HistoryActivity"
+            android:name="com.dalibortrampota.kahoothackapp.HistoryActivity"
             android:exported="false" />
         <activity
-            android:name="com.example.kahoothackapp.AnswersActivity"
+            android:name="com.dalibortrampota.kahoothackapp.AnswersActivity"
             android:exported="false"
-            android:parentActivityName="com.example.kahoothackapp.MainActivity" />
+            android:parentActivityName="com.dalibortrampota.kahoothackapp.MainActivity" />
         <activity
-            android:name="com.example.kahoothackapp.MainActivity"
+            android:name="com.dalibortrampota.kahoothackapp.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

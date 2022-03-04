@@ -1,4 +1,4 @@
-package com.example.kahoothackapp
+package com.dalibortrampota.kahoothackapp
 
 import org.junit.Test
 

@@ -1,4 +1,4 @@
-package com.example.kahoothackapp
+package com.dalibortrampota.kahoothackapp
 
 class KahootQuestion (
     var title: String,
