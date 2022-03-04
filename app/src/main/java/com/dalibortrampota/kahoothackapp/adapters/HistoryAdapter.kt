@@ -1,4 +1,4 @@
-package com.example.kahoothackapp.adapters
+package com.dalibortrampota.kahoothackapp.adapters
 
 import android.content.Intent
 import android.view.LayoutInflater
@@ -6,10 +6,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.example.kahoothackapp.AnswersActivity
-import com.example.kahoothackapp.R
-import com.example.kahoothackapp.database.QuestionsDao
-import com.example.kahoothackapp.database.Quiz
+import com.dalibortrampota.kahoothackapp.AnswersActivity
+import com.dalibortrampota.kahoothackapp.R
+import com.dalibortrampota.kahoothackapp.database.QuestionsDao
+import com.dalibortrampota.kahoothackapp.database.Quiz
 import com.github.marlonlom.utilities.timeago.TimeAgo
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch

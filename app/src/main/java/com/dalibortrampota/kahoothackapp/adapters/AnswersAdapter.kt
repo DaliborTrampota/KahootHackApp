@@ -1,4 +1,4 @@
-package com.example.kahoothackapp.adapters
+package com.dalibortrampota.kahoothackapp.adapters
 
 import android.view.LayoutInflater
 import android.view.View
@@ -6,8 +6,8 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.text.HtmlCompat
 import androidx.recyclerview.widget.RecyclerView
-import com.example.kahoothackapp.KahootQuestion
-import com.example.kahoothackapp.R
+import com.dalibortrampota.kahoothackapp.KahootQuestion
+import com.dalibortrampota.kahoothackapp.R
 
 class AnswersAdapter(private val data: KahootQuestion) : RecyclerView.Adapter<AnswersAdapter.ViewHolder>() {
 

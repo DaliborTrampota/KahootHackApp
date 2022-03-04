@@ -1,11 +1,11 @@
-package com.example.kahoothackapp
+package com.dalibortrampota.kahoothackapp
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.kahoothackapp.adapters.AnswersAdapter
+import com.dalibortrampota.kahoothackapp.adapters.AnswersAdapter
 import com.google.gson.Gson
 
 class AnswersActivity : AppCompatActivity() {
