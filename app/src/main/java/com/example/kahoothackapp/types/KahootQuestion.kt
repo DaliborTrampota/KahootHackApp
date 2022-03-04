@@ -1,6 +1,7 @@
 package com.example.kahoothackapp
 
 class KahootQuestion (
+    var title: String,
     var questions: List<Question>
 )
 
