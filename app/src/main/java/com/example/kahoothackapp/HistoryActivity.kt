@@ -9,8 +9,10 @@ import com.example.kahoothackapp.adapters.HistoryAdapter
 import com.example.kahoothackapp.database.QuestionsDao
 import com.example.kahoothackapp.database.QuestionsDatabase
 import com.example.kahoothackapp.database.Quiz
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class HistoryActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -27,8 +29,11 @@ class HistoryActivity : AppCompatActivity() {
 
         GlobalScope.launch {
             val adapter = HistoryAdapter(getHistory(dao), dao)
-            recyclerView.adapter = adapter
+            withContext(Dispatchers.Main) {
+                recyclerView.adapter = adapter
+            }
         }
+
     }
 
     private fun initializeToolbar() {
