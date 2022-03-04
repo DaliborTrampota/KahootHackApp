@@ -3,7 +3,7 @@ package com.example.kahoothackapp.database
 import android.content.Context
 import androidx.room.*
 
-@Database(entities = [Quizes::class], version = 1, exportSchema = false)
+@Database(entities = [Quiz::class], version = 1, exportSchema = false)
 abstract class QuestionsDatabase : RoomDatabase(){
     abstract fun questionsDao(): QuestionsDao
 

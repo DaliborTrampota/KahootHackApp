@@ -1,18 +1,15 @@
 package com.example.kahoothackapp.adapters
 
-import android.content.Context
 import android.content.Intent
-import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.example.kahoothackapp.AnswersActivity
 import com.example.kahoothackapp.R
 import com.example.kahoothackapp.database.QuestionsDao
-import com.example.kahoothackapp.database.Quizes
+import com.example.kahoothackapp.database.Quiz
 import com.github.marlonlom.utilities.timeago.TimeAgo
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -20,7 +17,7 @@ import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 
-class HistoryAdapter(private val data: List<Quizes>, private val dao: QuestionsDao) : RecyclerView.Adapter<HistoryAdapter.ViewHolder>(){
+class HistoryAdapter(private val data: List<Quiz>, private val dao: QuestionsDao) : RecyclerView.Adapter<HistoryAdapter.ViewHolder>(){
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         var v = LayoutInflater.from(parent.context).inflate(R.layout.card_layout, parent, false)

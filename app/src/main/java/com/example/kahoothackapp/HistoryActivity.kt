@@ -1,16 +1,14 @@
 package com.example.kahoothackapp
 
-import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.View
 import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.kahoothackapp.adapters.HistoryAdapter
 import com.example.kahoothackapp.database.QuestionsDao
 import com.example.kahoothackapp.database.QuestionsDatabase
-import com.example.kahoothackapp.database.Quizes
+import com.example.kahoothackapp.database.Quiz
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
@@ -47,7 +45,7 @@ class HistoryActivity : AppCompatActivity() {
         return true
     }
 
-    private suspend fun getHistory(dao: QuestionsDao): List<Quizes> {
+    private suspend fun getHistory(dao: QuestionsDao): List<Quiz> {
         return dao.loadAllQuizes()
     }
 }

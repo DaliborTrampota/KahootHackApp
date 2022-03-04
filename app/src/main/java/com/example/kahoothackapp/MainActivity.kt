@@ -15,7 +15,7 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.example.kahoothackapp.database.QuestionsDatabase
-import com.example.kahoothackapp.database.QuizesInsert
+import com.example.kahoothackapp.database.QuizInsert
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
@@ -154,7 +154,7 @@ class MainActivity : AppCompatActivity() {
 
                 val db = QuestionsDatabase.getDatabase(applicationContext)
                 val dao = db.questionsDao()
-                val db_data = QuizesInsert(Gson().fromJson(body, KahootQuestion::class.java).title, body)
+                val db_data = QuizInsert(Gson().fromJson(body, KahootQuestion::class.java).title, body)
 
                 GlobalScope.launch {
                     dao.insert(db_data)
