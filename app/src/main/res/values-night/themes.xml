@@ -3,7 +3,7 @@
 
 
 
-    <style name="Theme.KahootHackApp" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+    <style name="Theme.KahootHackApp" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/primaryDark</item>
         <item name="colorPrimaryVariant">@color/primaryDarkVariant</item>

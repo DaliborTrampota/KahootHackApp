@@ -1,12 +1,11 @@
 package com.example.kahoothackapp
 
-import android.app.Instrumentation
 import android.content.Intent
 import android.net.Uri
-import android.opengl.Visibility
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
@@ -14,16 +13,18 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatDelegate
-import androidx.core.view.isVisible
+import androidx.appcompat.app.AppCompatActivity
+import com.example.kahoothackapp.database.QuestionsDatabase
+import com.example.kahoothackapp.database.QuizInsert
 import com.google.gson.Gson
-import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.Text
 import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import okhttp3.*
 import java.io.IOException
 
@@ -47,7 +48,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
+        setSupportActionBar(findViewById(R.id.toolbar))
         //AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
 
         button = findViewById(R.id.gallery)
@@ -73,10 +74,24 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        answersIntent = Intent(this, Answers::class.java)
+        answersIntent = Intent(this, AnswersActivity::class.java)
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.default_toolbar, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
 
+    override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
+        R.id.action_history -> {
+            val historyIntent = Intent(this, HistoryActivity::class.java)
+            startActivity(historyIntent)
+            true
+        }
+        else -> {
+            super.onOptionsItemSelected(item)
+        }
+    }
 
     private fun onActivityResult(requestCode: Int, result: ActivityResult) {
         if(requestCode == IMAGE_REQUEST_CODE && result.resultCode == RESULT_OK){
@@ -115,7 +130,8 @@ class MainActivity : AppCompatActivity() {
         if(match == null)
             return setStatusText(true, "Quiz ID couldn't be extracted")
 
-        fetchAnswers(match.groupValues[1])
+        val lowercased = match.groupValues[1].lowercase()
+        fetchAnswers(lowercased)
     }
 
     private fun fetchAnswers(quizID: String){
@@ -135,6 +151,15 @@ class MainActivity : AppCompatActivity() {
                     })
                     return
                 }
+
+                val db = QuestionsDatabase.getDatabase(applicationContext)
+                val dao = db.questionsDao()
+                val db_data = QuizInsert(Gson().fromJson(body, KahootQuestion::class.java).title, body)
+
+                GlobalScope.launch {
+                    dao.insert(db_data)
+                }
+
                 answersIntent.putExtra("questions", body)
                 startActivity(answersIntent)
             }

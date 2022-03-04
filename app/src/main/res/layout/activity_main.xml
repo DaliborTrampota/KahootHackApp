@@ -7,6 +7,7 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
+    <include layout="@layout/toolbar" />
 
     <Button
         android:id="@+id/gallery"
@@ -37,10 +38,11 @@
         android:id="@+id/status"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:minHeight="32dp"
+        android:layout_marginTop="56dp"
         android:alpha="0"
         android:background="#FF0000"
         android:hint="error status"
+        android:minHeight="32dp"
         android:text="Quiz ID not detected"
         android:textAlignment="center"
         android:textColor="@color/white"

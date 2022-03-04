@@ -1,4 +1,4 @@
-package com.example.kahoothackapp
+package com.example.kahoothackapp.adapters
 
 import android.view.LayoutInflater
 import android.view.View
@@ -6,8 +6,10 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.text.HtmlCompat
 import androidx.recyclerview.widget.RecyclerView
+import com.example.kahoothackapp.KahootQuestion
+import com.example.kahoothackapp.R
 
-class MyAdapter(private val data: KahootQuestion) : RecyclerView.Adapter<MyAdapter.ViewHolder>() {
+class AnswersAdapter(private val data: KahootQuestion) : RecyclerView.Adapter<AnswersAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         var v = LayoutInflater.from(parent.context).inflate(R.layout.card_layout, parent, false)

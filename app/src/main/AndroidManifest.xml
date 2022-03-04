@@ -13,11 +13,14 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.KahootHackApp">
         <activity
-            android:parentActivityName=".MainActivity"
-            android:name=".Answers"
+            android:name="com.example.kahoothackapp.HistoryActivity"
             android:exported="false" />
         <activity
-            android:name=".MainActivity"
+            android:name="com.example.kahoothackapp.AnswersActivity"
+            android:exported="false"
+            android:parentActivityName="com.example.kahoothackapp.MainActivity" />
+        <activity
+            android:name="com.example.kahoothackapp.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
