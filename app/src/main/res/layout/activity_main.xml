@@ -63,7 +63,8 @@
         android:hint="edit ID"
         android:inputType="textShortMessage"
         android:textAlignment="center"
-        android:textColor="@color/white"
+        android:textColor="@color/bgLight"
+        android:textColorHint="@color/bgLight"
         android:textSize="20sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -72,6 +73,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.626"
-        tools:visibility="gone" />
+        tools:visibility="visible" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

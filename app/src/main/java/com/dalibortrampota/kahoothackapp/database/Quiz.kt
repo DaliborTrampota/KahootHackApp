@@ -2,7 +2,7 @@ package com.dalibortrampota.kahoothackapp.database
 
 import androidx.room.*
 
-@Entity(tableName = "questions")
+@Entity(tableName = "questions", indices = [Index(value = ["quiz_name"], unique = true)])
 data class Quiz (
     @ColumnInfo(name = "quiz_name") val quiz_name: String?,
     @ColumnInfo(name = "questions") val answers: String?,
@@ -18,7 +18,7 @@ data class QuizInsert(
 
 @Dao
 interface QuestionsDao {
-    @Insert(entity = Quiz::class)
+    @Insert(entity = Quiz::class, onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(data: QuizInsert)
 
     @Query("SELECT * FROM questions ORDER BY uid DESC")

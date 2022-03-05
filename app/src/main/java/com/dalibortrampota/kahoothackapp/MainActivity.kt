@@ -1,6 +1,7 @@
 package com.dalibortrampota.kahoothackapp
 
 import android.content.Intent
+import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -14,6 +15,7 @@ import android.widget.TextView
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.graphics.drawable.DrawableCompat
 import com.dalibortrampota.kahoothackapp.database.QuestionsDatabase
 import com.dalibortrampota.kahoothackapp.database.QuizInsert
 import com.google.gson.Gson
@@ -35,10 +37,13 @@ class MainActivity : AppCompatActivity() {
     private lateinit var imageView: ImageView
     private lateinit var statusText: TextView
     private lateinit var idPrompt: EditText
+    private lateinit var modeSwitchButton: MenuItem
     private var editMode = false
 
     private var QUIZ_ID_REGEX_ONE: Regex = Regex("details/(.+)")
     private var QUIZ_ID_REGEX_TWO: Regex = Regex("quiz(?:i|l)d=(.+)", RegexOption.IGNORE_CASE)
+    private var QUIZ_ID_REGEX_THREE: Regex = Regex("(?:/|\\?|&)?([^-]+-[^-]+-[^-]+-[^-]+-[^(?|$|&)]+)")
+
     private lateinit var answersIntent: Intent
 
     companion object {
@@ -63,8 +68,17 @@ class MainActivity : AppCompatActivity() {
 
         button.setOnClickListener {
             if(editMode){
-                disableEditMode()
-                fetchAnswers(idPrompt.text.toString())
+                if(idPrompt.text.toString().isEmpty()){
+                    setStatusText(true, "No quiz ID provided")
+                }else{
+                    disableEditMode()
+                    var quizID = detectQuizID((idPrompt.text.toString()))
+                    if(quizID == null) {
+                        setStatusText(true, "Invalid quiz ID provided")
+                    }else {
+                        fetchAnswers(quizID)
+                    }
+                }
             }else{
                 val intent = Intent(Intent.ACTION_PICK)
                 intent.type = "image/*"
@@ -79,6 +93,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.default_toolbar, menu)
+        if(menu != null) modeSwitchButton = menu.findItem(R.id.action_paste)
         return super.onCreateOptionsMenu(menu)
     }
 
@@ -86,6 +101,11 @@ class MainActivity : AppCompatActivity() {
         R.id.action_history -> {
             val historyIntent = Intent(this, HistoryActivity::class.java)
             startActivity(historyIntent)
+            true
+        }
+        R.id.action_paste -> {
+            if(editMode) disableEditMode()
+            else editQuizID("", false)
             true
         }
         else -> {
@@ -120,18 +140,16 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun handleText(text: Text){
-        var match: MatchResult? = null
+        var quizID: String? = null
         for (block in text.textBlocks) {
             val blockText = block.text
-            match = QUIZ_ID_REGEX_ONE.find(blockText)
-            if(match == null) match = QUIZ_ID_REGEX_TWO.find(blockText)
-            if(match != null) break
+            quizID = detectQuizID(blockText)
+            if(quizID != null) break
         }
-        if(match == null)
+        if(quizID == null)
             return setStatusText(true, "Quiz ID couldn't be extracted")
 
-        val lowercased = match.groupValues[1].lowercase()
-        fetchAnswers(lowercased)
+        fetchAnswers(quizID)
     }
 
     private fun fetchAnswers(quizID: String){
@@ -144,6 +162,13 @@ class MainActivity : AppCompatActivity() {
             override fun onResponse(call: Call, response: Response) {
                 var body = response.body?.string()
                 var json: JsonObject? = JsonParser().parse(body)?.asJsonObject
+
+                if(isPrivate(json)){
+                    runOnUiThread(Runnable() {
+                        setStatusText(true, "This Kahoot is private :(")
+                    })
+                    return
+                }
 
                 if (detectError(body, json)) {
                     runOnUiThread(Runnable() {
@@ -170,6 +195,10 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
+    private fun isPrivate(json: JsonObject?): Boolean {
+        return json?.get("error")?.asString == "FORBIDDEN"
+    }
+
     private fun detectError(body: String?, json: JsonObject?): Boolean {
         if(body == null || json == null) return true
         if(json.get("error")?.asString == "NOT_FOUND") return true
@@ -193,15 +222,42 @@ class MainActivity : AppCompatActivity() {
         idPrompt.visibility = View.GONE
         button.setText("SELECT IMAGE")
 
+        if(this::modeSwitchButton.isInitialized) {
+            //val typedValue = TypedValue()
+            //theme.resolveAttribute(android.R.attr.colorPrimary, typedValue, true)
+            //DrawableCompat.setTint(modeSwitchButton.icon, typedValue.data)
+            DrawableCompat.setTint(modeSwitchButton.icon, Color.WHITE)
+        }
     }
 
-    private fun editQuizID(foundID: String = ""){
+    private fun editQuizID(foundID: String = "", showStatusMessage: Boolean = true){
         editMode = true
-        setStatusText(true, "Extracted ID wasn't resolved properly. Check characters like o/0 or i/l/f")
+        if(showStatusMessage)
+            setStatusText(true, "Extracted ID wasn't resolved properly. Check characters like o/0 or i/l/f")
+        if(resources.getString(R.string.mode) == "Day") idPrompt.setBackgroundColor(resources.getColor(R.color.primaryLight))
+        else idPrompt.setBackgroundColor(resources.getColor(R.color.primaryDark))
+
         idPrompt.setText(foundID)
-        idPrompt.setHint("Input quiz ID manually")
+        idPrompt.setHint("Paste quiz ID here")
         idPrompt.visibility = View.VISIBLE
         button.setText("Confirm Quiz ID")
 
+        if(this::modeSwitchButton.isInitialized) {
+            //val typedValue = TypedValue()
+            //theme.resolveAttribute(android.R.attr.colorSecondary, typedValue, true)
+            //DrawableCompat.setTint(modeSwitchButton.icon, typedValue.data)
+            if(resources.getString(R.string.mode) == "Day") DrawableCompat.setTint(modeSwitchButton.icon, resources.getColor(R.color.bgDark))
+            else DrawableCompat.setTint(modeSwitchButton.icon, resources.getColor(R.color.bgDark))
+        }
+    }
+
+
+    private fun detectQuizID(str: String): String? {
+        var match = QUIZ_ID_REGEX_ONE.find(str)
+        if(match == null) match = QUIZ_ID_REGEX_TWO.find(str)
+        if(match == null) match = QUIZ_ID_REGEX_THREE.find(str)
+        if(match == null) return null
+
+        return match.groupValues[1].lowercase()
     }
 }
