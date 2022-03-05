@@ -1,6 +1,7 @@
 package com.dalibortrampota.kahoothackapp
 
 import android.content.Intent
+import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -14,6 +15,7 @@ import android.widget.TextView
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.graphics.drawable.DrawableCompat
 import com.dalibortrampota.kahoothackapp.database.QuestionsDatabase
 import com.dalibortrampota.kahoothackapp.database.QuizInsert
 import com.google.gson.Gson
@@ -35,6 +37,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var imageView: ImageView
     private lateinit var statusText: TextView
     private lateinit var idPrompt: EditText
+    private lateinit var modeSwitchButton: MenuItem
     private var editMode = false
 
     private var QUIZ_ID_REGEX_ONE: Regex = Regex("details/(.+)")
@@ -90,6 +93,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.default_toolbar, menu)
+        if(menu != null) modeSwitchButton = menu.findItem(R.id.action_paste)
         return super.onCreateOptionsMenu(menu)
     }
 
@@ -218,18 +222,35 @@ class MainActivity : AppCompatActivity() {
         idPrompt.visibility = View.GONE
         button.setText("SELECT IMAGE")
 
+        if(this::modeSwitchButton.isInitialized) {
+            //val typedValue = TypedValue()
+            //theme.resolveAttribute(android.R.attr.colorPrimary, typedValue, true)
+            //DrawableCompat.setTint(modeSwitchButton.icon, typedValue.data)
+            DrawableCompat.setTint(modeSwitchButton.icon, Color.WHITE)
+        }
     }
 
     private fun editQuizID(foundID: String = "", showStatusMessage: Boolean = true){
         editMode = true
         if(showStatusMessage)
             setStatusText(true, "Extracted ID wasn't resolved properly. Check characters like o/0 or i/l/f")
+        if(resources.getString(R.string.mode) == "Day") idPrompt.setBackgroundColor(resources.getColor(R.color.primaryLight))
+        else idPrompt.setBackgroundColor(resources.getColor(R.color.primaryDark))
+
         idPrompt.setText(foundID)
         idPrompt.setHint("Paste quiz ID here")
         idPrompt.visibility = View.VISIBLE
         button.setText("Confirm Quiz ID")
 
+        if(this::modeSwitchButton.isInitialized) {
+            //val typedValue = TypedValue()
+            //theme.resolveAttribute(android.R.attr.colorSecondary, typedValue, true)
+            //DrawableCompat.setTint(modeSwitchButton.icon, typedValue.data)
+            if(resources.getString(R.string.mode) == "Day") DrawableCompat.setTint(modeSwitchButton.icon, resources.getColor(R.color.bgDark))
+            else DrawableCompat.setTint(modeSwitchButton.icon, resources.getColor(R.color.bgDark))
+        }
     }
+
 
     private fun detectQuizID(str: String): String? {
         var match = QUIZ_ID_REGEX_ONE.find(str)
