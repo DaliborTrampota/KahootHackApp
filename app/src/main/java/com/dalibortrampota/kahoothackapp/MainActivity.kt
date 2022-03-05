@@ -39,6 +39,8 @@ class MainActivity : AppCompatActivity() {
 
     private var QUIZ_ID_REGEX_ONE: Regex = Regex("details/(.+)")
     private var QUIZ_ID_REGEX_TWO: Regex = Regex("quiz(?:i|l)d=(.+)", RegexOption.IGNORE_CASE)
+    private var QUIZ_ID_REGEX_THREE: Regex = Regex("(?:/|\\?|&)?([^-]+-[^-]+-[^-]+-[^-]+-[^(?|$|&)]+)")
+
     private lateinit var answersIntent: Intent
 
     companion object {
@@ -63,8 +65,17 @@ class MainActivity : AppCompatActivity() {
 
         button.setOnClickListener {
             if(editMode){
-                disableEditMode()
-                fetchAnswers(idPrompt.text.toString())
+                if(idPrompt.text.toString().isEmpty()){
+                    setStatusText(true, "No quiz ID provided")
+                }else{
+                    disableEditMode()
+                    var quizID = detectQuizID((idPrompt.text.toString()))
+                    if(quizID == null) {
+                        setStatusText(true, "Invalid quiz ID provided")
+                    }else {
+                        fetchAnswers(quizID)
+                    }
+                }
             }else{
                 val intent = Intent(Intent.ACTION_PICK)
                 intent.type = "image/*"
@@ -86,6 +97,11 @@ class MainActivity : AppCompatActivity() {
         R.id.action_history -> {
             val historyIntent = Intent(this, HistoryActivity::class.java)
             startActivity(historyIntent)
+            true
+        }
+        R.id.action_paste -> {
+            if(editMode) disableEditMode()
+            else editQuizID("", false)
             true
         }
         else -> {
@@ -120,18 +136,16 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun handleText(text: Text){
-        var match: MatchResult? = null
+        var quizID: String? = null
         for (block in text.textBlocks) {
             val blockText = block.text
-            match = QUIZ_ID_REGEX_ONE.find(blockText)
-            if(match == null) match = QUIZ_ID_REGEX_TWO.find(blockText)
-            if(match != null) break
+            quizID = detectQuizID(blockText)
+            if(quizID != null) break
         }
-        if(match == null)
+        if(quizID == null)
             return setStatusText(true, "Quiz ID couldn't be extracted")
 
-        val lowercased = match.groupValues[1].lowercase()
-        fetchAnswers(lowercased)
+        fetchAnswers(quizID)
     }
 
     private fun fetchAnswers(quizID: String){
@@ -144,6 +158,13 @@ class MainActivity : AppCompatActivity() {
             override fun onResponse(call: Call, response: Response) {
                 var body = response.body?.string()
                 var json: JsonObject? = JsonParser().parse(body)?.asJsonObject
+
+                if(isPrivate(json)){
+                    runOnUiThread(Runnable() {
+                        setStatusText(true, "This Kahoot is private :(")
+                    })
+                    return
+                }
 
                 if (detectError(body, json)) {
                     runOnUiThread(Runnable() {
@@ -168,6 +189,10 @@ class MainActivity : AppCompatActivity() {
                 editQuizID(quizID)
             }
         })
+    }
+
+    private fun isPrivate(json: JsonObject?): Boolean {
+        return json?.get("error")?.asString == "FORBIDDEN"
     }
 
     private fun detectError(body: String?, json: JsonObject?): Boolean {
@@ -195,13 +220,23 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    private fun editQuizID(foundID: String = ""){
+    private fun editQuizID(foundID: String = "", showStatusMessage: Boolean = true){
         editMode = true
-        setStatusText(true, "Extracted ID wasn't resolved properly. Check characters like o/0 or i/l/f")
+        if(showStatusMessage)
+            setStatusText(true, "Extracted ID wasn't resolved properly. Check characters like o/0 or i/l/f")
         idPrompt.setText(foundID)
-        idPrompt.setHint("Input quiz ID manually")
+        idPrompt.setHint("Paste quiz ID here")
         idPrompt.visibility = View.VISIBLE
         button.setText("Confirm Quiz ID")
 
+    }
+
+    private fun detectQuizID(str: String): String? {
+        var match = QUIZ_ID_REGEX_ONE.find(str)
+        if(match == null) match = QUIZ_ID_REGEX_TWO.find(str)
+        if(match == null) match = QUIZ_ID_REGEX_THREE.find(str)
+        if(match == null) return null
+
+        return match.groupValues[1].lowercase()
     }
 }
