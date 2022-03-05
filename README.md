@@ -7,7 +7,7 @@ It's an app that allows you to extract quiz ID from image containing the quiz ID
 
 ### Usage
 1. Open the app
-2. Click **SELECT IMAGE** button and select image containing the URL with the quiz ID
+2. Click **SELECT IMAGE** button and select image containing the URL with the quiz ID or click the clipboard icon in the toolbar to paste the quiz ID manually
 3. If a text box with the quiz ID showed up, it means that the quiz ID was detected incorrectly. Compare the detected quiz ID with the one on the image and correct it. (usually characters like o/0 or l/i/f are wrong)
 4. You should see all the questions and answers for the Kahoot! Happy cheating :)
 
