@@ -15,9 +15,11 @@ import android.widget.TextView
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.FileProvider
 import androidx.core.graphics.drawable.DrawableCompat
 import com.dalibortrampota.kahoothackapp.database.QuestionsDatabase
 import com.dalibortrampota.kahoothackapp.database.QuizInsert
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
@@ -28,17 +30,30 @@ import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import okhttp3.*
+import java.io.File
 import java.io.IOException
 
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var button: Button
+    private lateinit var photoButton: FloatingActionButton
     private lateinit var imageView: ImageView
     private lateinit var statusText: TextView
     private lateinit var idPrompt: EditText
     private lateinit var modeSwitchButton: MenuItem
     private var editMode = false
+    private var activityImageRequest = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        onActivityResult(IMAGE_REQUEST_CODE, result, null)
+    }
+
+    private lateinit var tmpUri: Uri
+    private var takePictureRequest = registerForActivityResult(ActivityResultContracts.TakePicture()) { result ->
+        if (result) {
+            onActivityResult(IMAGE_REQUEST_CODE, null, tmpUri)
+        }
+    }
+
 
     private var QUIZ_ID_REGEX_ONE: Regex = Regex("details/(.+)")
     private var QUIZ_ID_REGEX_TWO: Regex = Regex("quiz(?:i|l)d=(.+)", RegexOption.IGNORE_CASE)
@@ -57,38 +72,44 @@ class MainActivity : AppCompatActivity() {
         //AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
 
         button = findViewById(R.id.gallery)
+        photoButton = findViewById(R.id.takePhotoButton)
         imageView = findViewById(R.id.image)
         statusText = findViewById(R.id.status)
         idPrompt = findViewById(R.id.editID)
         disableEditMode()
 
-        var activity = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            onActivityResult(IMAGE_REQUEST_CODE, result)
-        }
+        button.setOnClickListener(imageListener)
+        photoButton.setOnClickListener(imageListener)
 
-        button.setOnClickListener {
-            if(editMode){
-                if(idPrompt.text.toString().isEmpty()){
-                    setStatusText(true, "No quiz ID provided")
-                }else{
-                    disableEditMode()
-                    var quizID = detectQuizID((idPrompt.text.toString()))
-                    if(quizID == null) {
-                        setStatusText(true, "Invalid quiz ID provided")
-                    }else {
-                        fetchAnswers(quizID)
-                    }
-                }
+        answersIntent = Intent(this, AnswersActivity::class.java)
+    }
+
+    private val imageListener = {view: View ->
+        if(editMode){
+            if(idPrompt.text.toString().isEmpty()){
+                setStatusText(true, "No quiz ID provided")
             }else{
+                disableEditMode()
+                var quizID = detectQuizID((idPrompt.text.toString()))
+                if(quizID == null) {
+                    setStatusText(true, "Invalid quiz ID provided")
+                }else {
+                    fetchAnswers(quizID)
+                }
+            }
+        }else{
+            if(view.id == R.id.takePhotoButton) {
+                tmpUri = getTmpFileUri()
+                takePictureRequest.launch(tmpUri)
+                setStatusText(false)
+            } else {
                 val intent = Intent(Intent.ACTION_PICK)
                 intent.type = "image/*"
 
-                activity.launch(intent)
+                activityImageRequest.launch(intent)
                 setStatusText(false)
             }
         }
-
-        answersIntent = Intent(this, AnswersActivity::class.java)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -113,8 +134,14 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun onActivityResult(requestCode: Int, result: ActivityResult) {
-        if(requestCode == IMAGE_REQUEST_CODE && result.resultCode == RESULT_OK){
+    private fun onActivityResult(requestCode: Int, result: ActivityResult?, teempuri: Uri?) {
+        if(teempuri != null) {
+            imageView.setImageURI(teempuri)
+            findQuizID(teempuri)
+            return
+        }
+
+        if(requestCode == IMAGE_REQUEST_CODE && result?.resultCode == RESULT_OK){
             var intent: Intent? = result.data
             imageView.setImageURI(intent?.data)
             var uri: Uri? = intent?.getData()
@@ -220,6 +247,7 @@ class MainActivity : AppCompatActivity() {
         editMode = false
         setStatusText(false)
         idPrompt.visibility = View.GONE
+        photoButton.visibility = View.VISIBLE
         button.setText("SELECT IMAGE")
 
         if(this::modeSwitchButton.isInitialized) {
@@ -241,16 +269,25 @@ class MainActivity : AppCompatActivity() {
         idPrompt.setHint("Paste quiz ID here")
         idPrompt.visibility = View.VISIBLE
         button.setText("Confirm Quiz ID")
+        photoButton.visibility = View.GONE
 
         if(this::modeSwitchButton.isInitialized) {
             //val typedValue = TypedValue()
             //theme.resolveAttribute(android.R.attr.colorSecondary, typedValue, true)
             //DrawableCompat.setTint(modeSwitchButton.icon, typedValue.data)
-            if(resources.getString(R.string.mode) == "Day") DrawableCompat.setTint(modeSwitchButton.icon, resources.getColor(R.color.bgDark))
-            else DrawableCompat.setTint(modeSwitchButton.icon, resources.getColor(R.color.bgDark))
+            if(resources.getString(R.string.mode) == "Day") DrawableCompat.setTint(modeSwitchButton.icon, resources.getColor(R.color.lightGreen))
+            else DrawableCompat.setTint(modeSwitchButton.icon, resources.getColor(R.color.lightGreen))
         }
     }
 
+    private fun getTmpFileUri(): Uri {
+        val tmpFile = File.createTempFile("tmp_image_file", ".png", cacheDir).apply {
+            createNewFile()
+            deleteOnExit()
+        }
+
+        return FileProvider.getUriForFile(applicationContext, "${BuildConfig.APPLICATION_ID}.provider", tmpFile)
+    }
 
     private fun detectQuizID(str: String): String? {
         var match = QUIZ_ID_REGEX_ONE.find(str)
