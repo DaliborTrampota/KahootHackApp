@@ -2,7 +2,7 @@
     <!-- Base application theme. -->
 
 
-
+    <string name="mode">Night</string>
     <style name="Theme.KahootHackApp" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/primaryDark</item>
