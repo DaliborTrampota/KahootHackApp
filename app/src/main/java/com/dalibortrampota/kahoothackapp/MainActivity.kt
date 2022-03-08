@@ -36,18 +36,24 @@ import java.io.IOException
 
 class MainActivity : AppCompatActivity() {
 
+    companion object {
+        val IMAGE_REQUEST_CODE = 100
+    }
+
     private lateinit var button: Button
     private lateinit var photoButton: FloatingActionButton
     private lateinit var imageView: ImageView
     private lateinit var statusText: TextView
     private lateinit var idPrompt: EditText
     private lateinit var modeSwitchButton: MenuItem
+    private lateinit var tmpUri: Uri
+    private lateinit var answersIntent: Intent
     private var editMode = false
+
     private var activityImageRequest = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         onActivityResult(IMAGE_REQUEST_CODE, result, null)
     }
 
-    private lateinit var tmpUri: Uri
     private var takePictureRequest = registerForActivityResult(ActivityResultContracts.TakePicture()) { result ->
         if (result) {
             onActivityResult(IMAGE_REQUEST_CODE, null, tmpUri)
@@ -59,11 +65,8 @@ class MainActivity : AppCompatActivity() {
     private var QUIZ_ID_REGEX_TWO: Regex = Regex("quiz(?:i|l)d=(.+)", RegexOption.IGNORE_CASE)
     private var QUIZ_ID_REGEX_THREE: Regex = Regex("(?:/|\\?|&)?([^-]+-[^-]+-[^-]+-[^-]+-[^(?|$|&)]+)")
 
-    private lateinit var answersIntent: Intent
 
-    companion object {
-        val IMAGE_REQUEST_CODE = 100
-    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -134,10 +137,10 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun onActivityResult(requestCode: Int, result: ActivityResult?, teempuri: Uri?) {
-        if(teempuri != null) {
-            imageView.setImageURI(teempuri)
-            findQuizID(teempuri)
+    private fun onActivityResult(requestCode: Int, result: ActivityResult?, tempUri: Uri?) {
+        if(tempUri != null) {
+            imageView.setImageURI(tempUri)
+            findQuizID(tempUri)
             return
         }
 
