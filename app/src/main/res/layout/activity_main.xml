@@ -15,7 +15,7 @@
         android:id="@+id/gallery"
         android:layout_width="wrap_content"
         android:layout_height="60dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="22dp"
         android:fontFamily="sans-serif"
         android:text="@string/select_image"
         android:textSize="16sp"
