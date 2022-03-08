@@ -63,7 +63,7 @@ class MainActivity : AppCompatActivity() {
 
     private var QUIZ_ID_REGEX_ONE: Regex = Regex("details/(.+)")
     private var QUIZ_ID_REGEX_TWO: Regex = Regex("quiz(?:i|l)d=(.+)", RegexOption.IGNORE_CASE)
-    private var QUIZ_ID_REGEX_THREE: Regex = Regex("(?:/|\\?|&)?([^-]+-[^-]+-[^-]+-[^-]+-[^(?|$|&)]+)")
+    private var QUIZ_ID_REGEX_THREE: Regex = Regex("([\\d\\w]+-[\\d\\w]+-[\\d\\w]+-[\\d\\w]+-[\\d\\w]+)")
 
 
 
@@ -253,20 +253,14 @@ class MainActivity : AppCompatActivity() {
         photoButton.visibility = View.VISIBLE
         button.setText("SELECT IMAGE")
 
-        if(this::modeSwitchButton.isInitialized) {
-            //val typedValue = TypedValue()
-            //theme.resolveAttribute(android.R.attr.colorPrimary, typedValue, true)
-            //DrawableCompat.setTint(modeSwitchButton.icon, typedValue.data)
+        if(this::modeSwitchButton.isInitialized)
             DrawableCompat.setTint(modeSwitchButton.icon, Color.WHITE)
-        }
     }
 
     private fun editQuizID(foundID: String = "", showStatusMessage: Boolean = true){
         editMode = true
         if(showStatusMessage)
             setStatusText(true, "Extracted ID wasn't resolved properly. Check characters like o/0 or i/l/f")
-        if(resources.getString(R.string.mode) == "Day") idPrompt.setBackgroundColor(resources.getColor(R.color.primaryLight))
-        else idPrompt.setBackgroundColor(resources.getColor(R.color.primaryDark))
 
         idPrompt.setText(foundID)
         idPrompt.setHint("Paste quiz ID here")
