@@ -89,15 +89,15 @@ class MainActivity : AppCompatActivity() {
 
     private val imageListener = {view: View ->
         if(editMode){
-            if(idPrompt.text.toString().isEmpty()){
-                setStatusText(true, "No quiz ID provided")
+            if(idPrompt.text.toString().isEmpty() || idPrompt.text.toString().length != 36){
+                setStatusText(true, "Invalid ID provided")
             }else{
-                disableEditMode()
                 var quizID = detectQuizID((idPrompt.text.toString()))
                 if(quizID == null) {
                     setStatusText(true, "Invalid quiz ID provided")
-                }else {
+                } else {
                     fetchAnswers(quizID)
+                    disableEditMode()
                 }
             }
         }else{
