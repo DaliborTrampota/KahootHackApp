@@ -14,14 +14,17 @@
         android:theme="@style/Theme.KahootHackApp">
         <activity
             android:name="com.dalibortrampota.kahoothackapp.HistoryActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="locked"/>
         <activity
             android:name="com.dalibortrampota.kahoothackapp.AnswersActivity"
             android:exported="false"
-            android:parentActivityName="com.dalibortrampota.kahoothackapp.MainActivity" />
+            android:parentActivityName="com.dalibortrampota.kahoothackapp.MainActivity"
+            android:screenOrientation="locked"/>
         <activity
             android:name="com.dalibortrampota.kahoothackapp.MainActivity"
-            android:exported="true">
+            android:exported="true"
+            android:screenOrientation="locked">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
