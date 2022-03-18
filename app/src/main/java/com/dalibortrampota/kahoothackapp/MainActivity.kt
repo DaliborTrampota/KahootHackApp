@@ -64,7 +64,7 @@ class MainActivity : AppCompatActivity() {
 
     private var QUIZ_ID_REGEX_ONE: Regex = Regex("details/(.+)")
     private var QUIZ_ID_REGEX_TWO: Regex = Regex("quiz(?:i|l)d=(.+)", RegexOption.IGNORE_CASE)
-    private var QUIZ_ID_REGEX_THREE: Regex = Regex("(?:/|\\?|&)?([^-]+-[^-]+-[^-]+-[^-]+-[^(?|$|&)]+)")
+    private var QUIZ_ID_REGEX_THREE: Regex = Regex("([\\d\\w]+-[\\d\\w]+-[\\d\\w]+-[\\d\\w]+-[\\d\\w]+)")
 
 
 
@@ -255,6 +255,7 @@ class MainActivity : AppCompatActivity() {
         editMode = true
         if(showStatusMessage)
             setStatusText(true, "Extracted ID wasn't resolved properly. Check characters like o/0 or i/l/f")
+
         if(resources.getString(R.string.mode) == "Day") idPrompt.setBackgroundColor(ContextCompat.getColor(this, R.color.primaryLight))
         else idPrompt.setBackgroundColor(ContextCompat.getColor(this, R.color.primaryDark))
 
