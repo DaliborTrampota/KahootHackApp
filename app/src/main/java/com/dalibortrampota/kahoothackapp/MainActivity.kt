@@ -15,6 +15,7 @@ import android.widget.TextView
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.graphics.drawable.DrawableCompat
 import com.dalibortrampota.kahoothackapp.database.QuestionsDatabase
@@ -89,16 +90,17 @@ class MainActivity : AppCompatActivity() {
 
     private val imageListener = {view: View ->
         if(editMode){
-            if(idPrompt.text.toString().isEmpty() || idPrompt.text.toString().length != 36){
-                setStatusText(true, "Invalid ID provided")
+            val inputText: String = idPrompt.text.toString()
+            var quizID: String? = null
+
+            if(!inputText.isEmpty() && inputText.length == 36)
+                quizID = detectQuizID(inputText)
+
+            if(quizID == null) {
+                setStatusText(true, "Invalid quiz ID provided")
             }else{
-                var quizID = detectQuizID((idPrompt.text.toString()))
-                if(quizID == null) {
-                    setStatusText(true, "Invalid quiz ID provided")
-                } else {
-                    fetchAnswers(quizID)
-                    disableEditMode()
-                }
+                fetchAnswers(quizID)
+                disableEditMode()
             }
         }else{
             if(view.id == R.id.takePhotoButton) {
@@ -129,7 +131,7 @@ class MainActivity : AppCompatActivity() {
         }
         R.id.action_paste -> {
             if(editMode) disableEditMode()
-            else editQuizID("", false)
+            else enableEditMode("", false)
             true
         }
         else -> {
@@ -140,18 +142,14 @@ class MainActivity : AppCompatActivity() {
     private fun onActivityResult(requestCode: Int, result: ActivityResult?, tempUri: Uri?) {
         if(tempUri != null) {
             imageView.setImageURI(tempUri)
-            findQuizID(tempUri)
-            return
+            return findQuizID(tempUri)
         }
 
         if(requestCode == IMAGE_REQUEST_CODE && result?.resultCode == RESULT_OK){
             var intent: Intent? = result.data
             imageView.setImageURI(intent?.data)
             var uri: Uri? = intent?.getData()
-            if (uri != null) {
-                findQuizID(uri)
-            }
-
+            if (uri != null) findQuizID(uri)
         }
     }
 
@@ -161,7 +159,7 @@ class MainActivity : AppCompatActivity() {
 
         recognizer.process(image)
             .addOnSuccessListener { visionText ->
-                handleText((visionText))
+                handleText(visionText)
             }
             .addOnFailureListener { e ->
                 setStatusText(true, "There was an error detecting text on the image")
@@ -194,17 +192,15 @@ class MainActivity : AppCompatActivity() {
                 var json: JsonObject? = JsonParser().parse(body)?.asJsonObject
 
                 if(isPrivate(json)){
-                    runOnUiThread(Runnable() {
+                    return runOnUiThread(Runnable() {
                         setStatusText(true, "This Kahoot is private :(")
                     })
-                    return
                 }
 
                 if (detectError(body, json)) {
-                    runOnUiThread(Runnable() {
-                        editQuizID(quizID)
+                    return runOnUiThread(Runnable() {
+                        enableEditMode(quizID)
                     })
-                    return
                 }
 
                 val db = QuestionsDatabase.getDatabase(applicationContext)
@@ -220,7 +216,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onFailure(call: Call, e: IOException) {
-                editQuizID(quizID)
+                enableEditMode(quizID)
             }
         })
     }
@@ -237,10 +233,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setStatusText(enabled: Boolean, text: String? = null){
-        if(!enabled) {
-            statusText.setAlpha(0f)
-            return
-        }
+        if(!enabled) return statusText.setAlpha(0f)
 
         statusText.setText(text)
         statusText.setAlpha(1f)
@@ -258,7 +251,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun editQuizID(foundID: String = "", showStatusMessage: Boolean = true){
+    private fun enableEditMode(foundID: String = "", showStatusMessage: Boolean = true){
         editMode = true
         if(showStatusMessage)
             setStatusText(true, "Extracted ID wasn't resolved properly. Check characters like o/0 or i/l/f")
