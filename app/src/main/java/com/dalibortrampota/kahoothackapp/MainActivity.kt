@@ -254,9 +254,6 @@ class MainActivity : AppCompatActivity() {
         button.setText("SELECT IMAGE")
 
         if(this::modeSwitchButton.isInitialized) {
-            //val typedValue = TypedValue()
-            //theme.resolveAttribute(android.R.attr.colorPrimary, typedValue, true)
-            //DrawableCompat.setTint(modeSwitchButton.icon, typedValue.data)
             DrawableCompat.setTint(modeSwitchButton.icon, Color.WHITE)
         }
     }
@@ -265,8 +262,8 @@ class MainActivity : AppCompatActivity() {
         editMode = true
         if(showStatusMessage)
             setStatusText(true, "Extracted ID wasn't resolved properly. Check characters like o/0 or i/l/f")
-        if(resources.getString(R.string.mode) == "Day") idPrompt.setBackgroundColor(resources.getColor(R.color.primaryLight))
-        else idPrompt.setBackgroundColor(resources.getColor(R.color.primaryDark))
+        if(resources.getString(R.string.mode) == "Day") idPrompt.setBackgroundColor(ContextCompat.getColor(this, R.color.primaryLight))
+        else idPrompt.setBackgroundColor(ContextCompat.getColor(this, R.color.primaryDark))
 
         idPrompt.setText(foundID)
         idPrompt.setHint("Paste quiz ID here")
@@ -275,11 +272,8 @@ class MainActivity : AppCompatActivity() {
         photoButton.visibility = View.GONE
 
         if(this::modeSwitchButton.isInitialized) {
-            //val typedValue = TypedValue()
-            //theme.resolveAttribute(android.R.attr.colorSecondary, typedValue, true)
-            //DrawableCompat.setTint(modeSwitchButton.icon, typedValue.data)
-            if(resources.getString(R.string.mode) == "Day") DrawableCompat.setTint(modeSwitchButton.icon, resources.getColor(R.color.lightGreen))
-            else DrawableCompat.setTint(modeSwitchButton.icon, resources.getColor(R.color.lightGreen))
+            if(resources.getString(R.string.mode) == "Day") DrawableCompat.setTint(modeSwitchButton.icon, ContextCompat.getColor(this, R.color.lightGreen))
+            else DrawableCompat.setTint(modeSwitchButton.icon, ContextCompat.getColor(this, R.color.lightGreen))
         }
     }
 
