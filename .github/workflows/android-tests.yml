@@ -1,15 +1,18 @@
 name: Android build testing
 
 on: 
-  push:
-    branches:
-      - main
+  pull-request:
+    types:
+      - opened
+      - reopened
 
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
+      with:
+        ref: ${{ github.event.pull_request.head.sha }}
     - name: setup jdk
       uses: actions/setup-java@v3
       with:
