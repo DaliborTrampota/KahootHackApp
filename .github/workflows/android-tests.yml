@@ -1,0 +1,22 @@
+name: Android build testing
+
+on: 
+  push:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: setup jdk
+      uses: actions/setup-java@v3
+      with:
+        java-version: '11'
+        distribution: 'temurin'
+        cache: gradle
+    - name: Make Gradle executable
+      run: chmod +x gradlew
+    - name: Run Tests
+      run: bash ./gradlew test --stacktrace

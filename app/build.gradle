@@ -4,6 +4,18 @@ plugins {
     id 'kotlin-kapt'
 }
 
+def getCheckedOutGitCommitHash() {
+    def gitFolder = "$projectDir/../.git/"
+    def takeFromHash = 12
+    def head = new File(gitFolder + "HEAD").text.split(":")
+    def isCommit = head.length == 1
+
+    if(isCommit) return head[0].trim().take(takeFromHash)
+
+    def refHead = new File(gitFolder + head[1].trim())
+    refHead.text.trim().take takeFromHash
+}
+
 android {
     compileSdk 32
 
@@ -12,7 +24,7 @@ android {
         minSdk 26
         targetSdk 32
         versionCode 1
-        versionName "1.0"
+        versionName "1.0-" + getCheckedOutGitCommitHash()
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -54,4 +66,10 @@ dependencies {
     kapt("androidx.room:room-compiler:2.4.2")
 
     implementation "com.github.marlonlom:timeago:latest.release"
+}
+
+task generateVersionTxt {
+    doLast {
+        file("./version.txt").text = android.defaultConfig.versionName
+    }
 }

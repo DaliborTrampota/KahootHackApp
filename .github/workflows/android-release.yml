@@ -1,0 +1,31 @@
+name: Android release
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    - name: setup jdk
+      uses: actions/setup-java@v3
+      with:
+        java-version: '11'
+        distribution: 'temurin'
+        cache: gradle
+    - name: Make Gradle executable
+      run: chmod +x gradlew
+    - name: Build Release APK
+      run: ./gradlew assembleDebug
+    - name: Generate version.txt for Hub release
+      run: ./gradlew generateVersionTxt
+    - name: Releasing using Hub
+      uses: valley-fordham/action-release-debugapk@master
+      env:
+       GITHUB_TOKEN: ${{ secrets.TOKEN }}
+       APP_FOLDER: app
+       RELEASE_TITLE: New Build
